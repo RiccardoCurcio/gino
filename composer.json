@@ -1,0 +1,25 @@
+{
+    "name": "riccardo-curcio/gino",
+    "description": "Is a simple routing systemo over swoole",
+    "type": "library",
+    "require": {
+        "psr/log": "^1.1"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.5",
+        "swoole/ide-helper": "@dev"
+    },
+    "license": "LGPL-3.0-only / LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Riccardo Curcio",
+            "email": "curcioriccardo@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Gino\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
