@@ -1,34 +1,33 @@
 <?php
 /**
  * DependencyInjection
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category DependencyInjection
  * @package  DependencyInjection
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 
 namespace Gino\Src\DependencyInjection;
 
 /**
  * DependencyInjection trait
- * 
+ *
  * @category DependencyInjection
  * @package  DependencyInjection
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 trait DependencyInjection
 {
     /**
      * Resolve dependenciese
      *
-     * @param string $className 
-     * 
+     * @param string $className
      * @return object
      */
     public static function containers(string $className) : object
@@ -39,13 +38,12 @@ trait DependencyInjection
         if ($reflection->isInstantiable()) {
             $dependenciesArray = [];
             foreach ($constructor->getParameters() as $value) {
-              
                 $dependency = DependencyInjection::getHint(
                     $constructor->getDocComment(),
                     $value->name
                 );
                 
-                if ($dependency) { 
+                if ($dependency) {
                     $reflectionDep = new \ReflectionClass($dependency);
                     
                     if ($reflectionDep->isInstantiable()) {
@@ -61,10 +59,8 @@ trait DependencyInjection
                                 $reflectionDep->newInstanceArgs()
                             );
                         }
-                        
                     }
                 }
-                
             }
             return $reflection->newInstanceArgs($dependenciesArray);
         }
@@ -73,9 +69,9 @@ trait DependencyInjection
     /**
      * Dependecies type from docComment
      *
-     * @param string $docComment 
-     * @param string $varName 
-     * 
+     * @param string $docComment
+     * @param string $varName
+     *
      * @return string|null
      */
     public static function getHint(string $docComment, string $varName) : string|null
@@ -88,9 +84,8 @@ trait DependencyInjection
         );
 
         if ($count > 0) {
-            foreach ($matches['name'] as $n=>$name ) {
+            foreach ($matches['name'] as $n => $name) {
                 if ($name == $varName) {
-                    
                     return $matches['type'][$n];
                 }
             }

@@ -1,6 +1,6 @@
 {
     "name": "riccardo-curcio/gino",
-    "description": "Is a simple routing systemo over swoole",
+    "description": "Is a simple routing system over swoole",
     "type": "library",
     "require": {
         "psr/log": "^1.1"

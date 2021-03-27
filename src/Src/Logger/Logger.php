@@ -1,14 +1,14 @@
 <?php
 /**
  * Logger
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category Logger
  * @package  Logger
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 namespace Gino\Src\Logger;
 
@@ -16,32 +16,32 @@ use \Psr\Log\AbstractLogger;
 
 /**
  * Logger
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category Logger
  * @package  Logger
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 class Logger extends AbstractLogger
 {
 
     /**
-     * Costructor Logger 
+     * Costructor Logger
      */
     public function __construct()
     {
-        // 
+        // --
     }
 
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level 
-     * @param string $message 
-     * @param array  $context 
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
      *
      * @return void
      *
@@ -55,12 +55,12 @@ class Logger extends AbstractLogger
 
         if (gettype($message) == "array") {
             $message = json_encode(
-                $message, 
-                JSON_UNESCAPED_LINE_TERMINATORS | 
-                JSON_UNESCAPED_UNICODE | 
-                JSON_UNESCAPED_SLASHES | 
-                JSON_HEX_TAG | 
-                JSON_HEX_AMP | 
+                $message,
+                JSON_UNESCAPED_LINE_TERMINATORS |
+                JSON_UNESCAPED_UNICODE |
+                JSON_UNESCAPED_SLASHES |
+                JSON_HEX_TAG |
+                JSON_HEX_AMP |
                 JSON_HEX_APOS
             );
         }
