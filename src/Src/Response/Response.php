@@ -169,15 +169,31 @@ class Response
     private function arrayToXml(array $array, ?string $rootElement = null)
     {
         $_xml = new \SimpleXMLElement($rootElement !== null ? $rootElement : '<root/>');
-          
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                $this->arrayToXml($v, $k, $_xml->addChild($k));
-            } else {
-                $_xml->addChild($k, $v);
-            }
-        }
-          
-        return $_xml->asXML();
+        return $this->parser($array, $_xml)->asXML();
+        
     }
+
+    /**
+     * 
+     */
+    private function parser($arrayNode, \SimpleXMLElement $xml = null ) {
+        if ( is_array( $arrayNode ) ) {
+          foreach( $arrayNode as $key => $value ) {
+            if ( is_int( $key ) ) {
+              if ( $key == 0 ) {
+                $node = $xml;
+              } else {
+                $parent = $xml->xpath( ".." )[0];
+                $node = $parent->addChild( $xml->getName() );
+              }
+            } else {
+              $node = $xml->addChild( $key );
+            }
+            $this->parser( $value, $node );
+          }
+        } else {
+          $xml[0] = $arrayNode;
+        }
+        return $xml;
+      }
 }

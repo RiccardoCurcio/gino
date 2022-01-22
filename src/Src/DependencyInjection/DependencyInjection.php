@@ -25,7 +25,7 @@ namespace Gino\Src\DependencyInjection;
 trait DependencyInjection
 {
     /**
-     * Resolve dependenciese
+     * Resolve dependenciese (e' inutile che fai lo splendido tanto ti devo riscrivere!)
      *
      * @param string $className
      * @return object
