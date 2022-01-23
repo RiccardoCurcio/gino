@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Response object
  *
@@ -53,7 +54,7 @@ class Response
      *
      * @return void
      */
-    private function setHeaderContentType(string $contentType) : void
+    private function setHeaderContentType(string $contentType): void
     {
         $this->response->header("Content-Type", $contentType);
     }
@@ -65,11 +66,11 @@ class Response
      *
      * @return void
      */
-    private function setResponeStatusCode(int $code) : void
+    private function setResponeStatusCode(int $code): void
     {
         $this->response->status($code);
     }
-    
+
     /**
      * Generate json response
      *
@@ -83,21 +84,21 @@ class Response
         int $code,
         string $contentType = "application/json",
         string $charset = null
-    ) : void {
-        
+    ): void {
+
         $charset = $charset ?? (getenv('CHARSET') == false ? 'utf-8' : getenv('CHARSET'));
-        
+
         $this->setHeaderContentType($contentType . "; charset=" . $charset);
         $this->setResponeStatusCode($code);
         $this->response->end(
             json_encode(
                 $content,
                 JSON_UNESCAPED_LINE_TERMINATORS |
-                JSON_UNESCAPED_UNICODE |
-                JSON_UNESCAPED_SLASHES |
-                JSON_HEX_TAG |
-                JSON_HEX_AMP |
-                JSON_HEX_APOS
+                    JSON_UNESCAPED_UNICODE |
+                    JSON_UNESCAPED_SLASHES |
+                    JSON_HEX_TAG |
+                    JSON_HEX_AMP |
+                    JSON_HEX_APOS
             )
         );
     }
@@ -115,9 +116,9 @@ class Response
         int $code,
         string $contentType = "text/xml",
         string $charset = null
-    ) : void {
+    ): void {
         $charset = $charset ?? (getenv('CHARSET') == false ? 'utf-8' : getenv('CHARSET'));
-        
+
         $this->setHeaderContentType($contentType . "; charset=" . $charset);
         $this->setResponeStatusCode($code);
         $this->response->end(
@@ -133,7 +134,7 @@ class Response
      *
      * @return void
      */
-    public function response(array $content, int $code, Request $request) : void
+    public function response(array $content, int $code, Request $request): void
     {
         switch ($request->get('response-content-type')['type']) {
             case 'json':
@@ -164,36 +165,40 @@ class Response
      * @param array $array
      * @param string|null $rootElement
      * @param string|null $xml
-     * @return void
+     * @return string|bool
      */
-    private function arrayToXml(array $array, ?string $rootElement = null)
+    private function arrayToXml(array $array, ?string $rootElement = null): string|bool
     {
         $_xml = new \SimpleXMLElement($rootElement !== null ? $rootElement : '<root/>');
         return $this->parser($array, $_xml)->asXML();
-        
     }
 
     /**
-     * 
+     * Parse array for create xml
+     *
+     * @param mixed $arrayNode
+     * @param \SimpleXMLElement $xml
+     * @return \SimpleXMLElement
      */
-    private function parser($arrayNode, \SimpleXMLElement $xml = null ) {
-        if ( is_array( $arrayNode ) ) {
-          foreach( $arrayNode as $key => $value ) {
-            if ( is_int( $key ) ) {
-              if ( $key == 0 ) {
-                $node = $xml;
-              } else {
-                $parent = $xml->xpath( ".." )[0];
-                $node = $parent->addChild( $xml->getName() );
-              }
-            } else {
-              $node = $xml->addChild( $key );
+    private function parser(mixed $arrayNode, \SimpleXMLElement $xml = null): \SimpleXMLElement
+    {
+        if (is_array($arrayNode)) {
+            foreach ($arrayNode as $key => $value) {
+                if (is_int($key)) {
+                    if ($key == 0) {
+                        $node = $xml;
+                    } else {
+                        $parent = $xml->xpath("..")[0];
+                        $node = $parent->addChild($xml->getName());
+                    }
+                } else {
+                    $node = $xml->addChild($key);
+                }
+                $this->parser($value, $node);
             }
-            $this->parser( $value, $node );
-          }
         } else {
-          $xml[0] = $arrayNode;
+            $xml[0] = $arrayNode;
         }
         return $xml;
-      }
+    }
 }
