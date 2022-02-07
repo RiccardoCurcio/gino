@@ -1,8 +1,8 @@
-# Gino
-Simple json api framework over swoole
+# Gino (ALPHA)
+Simple json api framework over swoole for php microservice
 
 ## Dependencies
-*[swoole](https://openswoole.com/)*
+*[open-swoole](https://openswoole.com/)*
 
 ## Features
 * routing system
