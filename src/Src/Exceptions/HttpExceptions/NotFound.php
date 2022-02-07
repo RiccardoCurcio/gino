@@ -1,42 +1,42 @@
 <?php
 /**
  * HttpExceptions
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category HttpExceptions
  * @package  HttpExceptions
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 namespace Gino\Src\Exceptions\HttpExceptions;
 
 /**
  * NotFound
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category HttpExceptions
  * @package  HttpExceptions
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 class NotFound extends \Exception
 {
     /**
      * Costructor
      *
-     * @param string     $message 
-     * @param integer    $code 
-     * @param \Throwable $previous 
+     * @param string     $message
+     * @param integer    $code
+     * @param \Throwable $previous
      */
     public function __construct(
         $message = 'Not found',
         $code = 0,
         \Throwable $previous = null
-    ) {    
+    ) {
         parent::__construct($message, $code, $previous);
     }
 
@@ -45,7 +45,7 @@ class NotFound extends \Exception
      *
      * @return string
      */
-    public function __toString() : string 
+    public function __toString() : string
     {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
@@ -55,9 +55,8 @@ class NotFound extends \Exception
      *
      * @return integer
      */
-    public function statusCode() : int 
+    public function statusCode() : int
     {
         return 404;
     }
-
 }

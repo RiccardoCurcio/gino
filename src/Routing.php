@@ -1,26 +1,26 @@
 <?php
 /**
  * Routing
- * 
+ *
  * PHP version 8
- * 
+ *
  * @category Routing
  * @package  Routing
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 
 namespace Gino;
 
 /**
  * Routing class
- * 
+ *
  * @category Routing
  * @package  Routing
  * @author   Riccardo Curcio <curcioriccardo@gmail.com>
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
- * @link     http://url.com 
+ * @link     http://url.com
  */
 class Routing
 {
@@ -33,9 +33,9 @@ class Routing
     
     /**
      * Routing constructor
-     * 
-     * @param array|null $add 
-     * 
+     *
+     * @param array|null $add
+     *
      * @return void
      */
     public function __construct(?array $add = [])
@@ -44,16 +44,13 @@ class Routing
         $this->routes = [
             "GET"       => [],
             "POST"      => [],
-            "PUT"       => [], 
-            "PATCH"     => [], 
+            "PUT"       => [],
+            "PATCH"     => [],
             "DELETE"    => [],
             "OPTION"    => [],
             "HEAD"      => [],
             "TRACE"     => [],
             "CONNECT"   => []
         ];
-
     }
-
-   
 }
