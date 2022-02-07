@@ -136,7 +136,7 @@ class Response
      */
     public function response(array $content, int $code, Request $request): void
     {
-        switch ($request->get('response-content-type')['type']) {
+        switch ($request->get('response-content-type')['type'] ?? null) {
             case 'json':
                 $this->json(
                     $content,
