@@ -433,6 +433,7 @@ VERSIONING_TYPE=ACCEPT_HEADER
 VERSIONING_ALLOWED_RESPONSE_TYPE=json,xml
 ```
 
+## Run
 ```
 $ composer install
 $ php main.php
