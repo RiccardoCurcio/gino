@@ -30,6 +30,7 @@ class Routing
 
     use \Gino\Src\Routes;
     use \Gino\Src\Runner;
+    use \Gino\Src\CorsOrigin\CorsOrigin;
     
     /**
      * Routing constructor
@@ -38,7 +39,7 @@ class Routing
      *
      * @return void
      */
-    public function __construct(?array $add = [])
+    public function __construct(?array $add = [], ?bool $corsOrigin = false)
     {
         $this->add = $add;
         $this->routes = [
@@ -47,10 +48,12 @@ class Routing
             "PUT"       => [],
             "PATCH"     => [],
             "DELETE"    => [],
-            "OPTION"    => [],
+            "OPTIONS"    => [],
             "HEAD"      => [],
             "TRACE"     => [],
             "CONNECT"   => []
         ];
+       
+        $this->resolveCors($this);
     }
 }
