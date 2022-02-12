@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Matcher
  *
@@ -10,6 +11,7 @@
  * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
  * @link     http://url.com
  */
+
 namespace Gino\Src;
 
 use \Gino\Src\Exceptions\HttpExceptions\NotFound;
@@ -28,7 +30,7 @@ use Swoole\Http2\Request as SwooleRequest2;
  */
 trait Matcher
 {
-    
+
 
     /**
      * Match request
@@ -38,7 +40,7 @@ trait Matcher
      *
      * @return array|null
      */
-    public static function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes) : ?array
+    public static function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes): ?array
     {
         $request = new request();
         $request->set("gino-request-code", uniqid('GINO-', true));
@@ -47,24 +49,24 @@ trait Matcher
         Matcher::setHeaders($request, $httpRequest->header);
         Matcher::setQueryString($request, $httpRequest->get);
         $uri = Matcher::setVersion($request, $httpRequest->server["request_uri"]);
-        
+
         foreach ($routes[$httpRequest->getMethod()] as $value) {
             $regex = str_replace("/", "\\/", $value["uri"]);
-            
+
             while (preg_match("/{.*?}/m", $regex)) {
                 $regex = preg_replace("/{tail.*}/m", "*", $regex);
                 $regex = preg_replace("/{.*?}/m", "[^?]*", $regex);
             }
-            
-            $regex = "/".$regex."$/m";
-            
+
+            $regex = "/" . $regex . "$/m";
+
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
                 Matcher::setParam(
                     $request,
                     $value["uri"],
                     $uri
                 );
-                
+
                 Matcher::setBody($request, $httpRequest);
                 return [
                     "class" => $value["className"],
@@ -91,15 +93,20 @@ trait Matcher
         Request $request,
         string $routeUri,
         string $requestUri
-    ) : void {
+    ): void {
         $regex = "/{(.*?)}/m";
         $routeSplit = explode('/', $routeUri);
         $uriSplit = explode('/', $requestUri);
-        foreach ($routeSplit as $key => $value) {
-            if (preg_match_all($regex, $value, $matches, PREG_SET_ORDER) > 0) {
-                $request->set($matches[0][1], $uriSplit[$key]);
-            }
-        }
+
+        array_map(
+            function ($key, $value) use (&$request, &$uriSplit, $regex) {
+                if (preg_match_all($regex, $value, $matches, PREG_SET_ORDER) > 0) {
+                    $request->set($matches[0][1], $uriSplit[$key]);
+                }
+            },
+            array_keys($routeSplit),
+            array_values($routeSplit)
+        );
     }
 
     /**
@@ -110,22 +117,26 @@ trait Matcher
      *
      * @return void
      */
-    public static function setHeaders(Request $request, array $header) : void
+    public static function setHeaders(Request $request, array $header): void
     {
-        foreach ($header as $key => $value) {
-            $request->set(
-                str_replace(
-                    ' ',
-                    '-',
-                    ucwords(
-                        strtolower(
-                            str_replace('_', ' ', $key)
-                        )
-                    )
-                ),
-                $value
-            );
-        }
+        array_map(
+            function ($key, $value) use (&$request) {
+                $request->set(Matcher::normalizeHeaderKey($key), $value);
+            },
+            array_keys($header),
+            array_values($header)
+        );
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function normalizeHeaderKey(string $key): string
+    {
+        return str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $key))));
     }
 
     /**
@@ -136,12 +147,16 @@ trait Matcher
      *
      * @return void
      */
-    public static function setQueryString(Request $request, ?array $get) : void
+    public static function setQueryString(Request $request, ?array $get = null): void
     {
         if ($get) {
-            foreach ($get as $key => $value) {
-                $request->set($key, $value);
-            }
+            array_map(
+                function ($key, $value) use (&$request) {
+                    $request->set($key, $value);
+                },
+                array_keys($get),
+                array_values($get)
+            );
         }
     }
 
@@ -178,21 +193,12 @@ trait Matcher
                 $uri = '/v' . $request->get(getenv('VERSIONING_KEY', 'version')) . $uri;
                 break;
             case 'CUSTOM_HEADER':
-                $key = str_replace(
-                    ' ',
-                    '-',
-                    ucwords(
-                        strtolower(
-                            str_replace('_', ' ', getenv('HEADER_KEY', 'Api-version'))
-                        )
-                    )
-                );
                 $header = explode("=", $request->get(getenv('HEADER_KEY', 'Api-Version')));
                 $uri = $header[0] === getenv('VERSIONING_KEY', 'version') ? '/v' . $header[1] . $uri : $uri;
                 break;
             case 'ACCEPT_HEADER':
                 $accept = $request->get('Accept');
-                $service = 'application/vnd.'. explode(":", $request->get('Host'))[0];
+                $service = 'application/vnd.' . explode(":", $request->get('Host'))[0];
                 $versionType = Matcher::strstrAfter($accept, $service . '.');
                 $uri =  '/' . $versionType['version'] . $uri;
 
@@ -200,14 +206,14 @@ trait Matcher
                     $versionType['response-content-type'],
                     explode(',', getenv('VERSIONING_ALLOWED_RESPONSE_TYPE'))
                 ) ?
-                $request->set(
-                    'response-content-type',
-                    [
-                        "type" => $versionType['response-content-type'],
-                        "content-type" => $accept
-                    ]
-                ) :
-                throw new NotFound('Route not found!', 0);
+                    $request->set(
+                        'response-content-type',
+                        [
+                            "type" => $versionType['response-content-type'],
+                            "content-type" => $accept
+                        ]
+                    ) :
+                    throw new NotFound('Route not found!', 0);
                 break;
             default:
                 // default is uri type
