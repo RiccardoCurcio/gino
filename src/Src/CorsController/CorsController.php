@@ -59,7 +59,6 @@ class CorsController
     public function resolve(Request $request, Response $response)
     {
         $this->logger->info("Resolve cors");
-
         $corsHeaders = [
             "access-control-allow-credentials" => getenv("ALLOW_CREDENTIALS") ? getenv("ALLOW_CREDENTIALS") : "true",
             "access-control-allow-origin" => getenv("ALLOW_ORIGIN") ? getenv("ALLOW_ORIGIN") : "*",

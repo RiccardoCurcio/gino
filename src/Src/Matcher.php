@@ -33,7 +33,7 @@ trait Matcher
 
 
     /**
-     * Match request
+     * Match request *** da rivedere
      *
      * @param \Swoole\Http\Request|SwooleRequest2   $httpRequest
      * @param array                                 $routes
@@ -49,23 +49,27 @@ trait Matcher
         Matcher::setHeaders($request, $httpRequest->header);
         Matcher::setQueryString($request, $httpRequest->get);
         $uri = Matcher::setVersion($request, $httpRequest->server["request_uri"]);
-
+        $all = false;
         foreach ($routes[$httpRequest->getMethod()] as $value) {
             $regex = str_replace("/", "\\/", $value["uri"]);
-
+            $regex = preg_replace("/{tail.*}/m", "*", $regex, -1, $count);
+            if ($count > 0) {
+                $all = true;
+            }
             while (preg_match("/{.*?}/m", $regex)) {
-                $regex = preg_replace("/{tail.*}/m", "*", $regex);
                 $regex = preg_replace("/{.*?}/m", "[^?]*", $regex);
             }
 
             $regex = "/" . $regex . "$/m";
 
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
-                Matcher::setParam(
-                    $request,
-                    $value["uri"],
-                    $uri
-                );
+                if (!$all) {
+                    Matcher::setParam(
+                        $request,
+                        $value["uri"],
+                        $uri
+                    );
+                }
 
                 Matcher::setBody($request, $httpRequest);
                 return [
