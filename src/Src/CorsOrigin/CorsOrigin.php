@@ -30,7 +30,7 @@ trait CorsOrigin
     public static function resolveCors($app) {
         
         $app->options(
-            "/",
+            "/{tail.*}",
             '\Gino\Src\CorsController\CorsController'::class,
             'resolve',
             []

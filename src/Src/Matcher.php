@@ -15,6 +15,7 @@ namespace Gino\Src;
 use \Gino\Src\Exceptions\HttpExceptions\NotFound;
 use Swoole\Http\Request as SwooleRequest;
 use \Gino\Src\Request\Request;
+use Swoole\Http2\Request as SwooleRequest2;
 
 /**
  * Matcher trait
@@ -32,12 +33,12 @@ trait Matcher
     /**
      * Match request
      *
-     * @param \Swoole\Http\Request $httpRequest
-     * @param array                $routes
+     * @param \Swoole\Http\Request|SwooleRequest2   $httpRequest
+     * @param array                                 $routes
      *
      * @return array|null
      */
-    public static function match(SwooleRequest $httpRequest, array $routes) : ?array
+    public static function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes) : ?array
     {
         $request = new request();
         $request->set("gino-request-code", uniqid('GINO-', true));
@@ -51,6 +52,7 @@ trait Matcher
             $regex = str_replace("/", "\\/", $value["uri"]);
             
             while (preg_match("/{.*?}/m", $regex)) {
+                $regex = preg_replace("/{tail.*}/m", "*", $regex);
                 $regex = preg_replace("/{.*?}/m", "[^?]*", $regex);
             }
             
@@ -146,12 +148,12 @@ trait Matcher
     /**
      * Set body content
      *
-     * @param \Gino\Src\Request\Request $request
-     * @param SwooleRequest             $httpRequest
+     * @param \Gino\Src\Request\Request     $request
+     * @param SwooleRequest|SwooleRequest2  $httpRequest
      *
      * @return void
      */
-    public static function setBody(Request $request, SwooleRequest $httpRequest)
+    public static function setBody(Request $request, SwooleRequest|SwooleRequest2 $httpRequest)
     {
         switch ($request->get('Content-type')) {
             case 'application/json':

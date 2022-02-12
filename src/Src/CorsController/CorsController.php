@@ -73,9 +73,9 @@ class CorsController
         ];
 
         $response->response(
+            $request,
             [],
             204,
-            $request,
             $corsHeaders
         );
     }

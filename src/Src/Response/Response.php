@@ -15,6 +15,7 @@
 namespace Gino\Src\Response;
 
 use Swoole\Http\Response as SwooleResponse;
+use Swoole\Http2\Response as SwooleResponse2;
 use \Gino\Src\Request\Request;
 
 /**
@@ -31,18 +32,18 @@ class Response
     /**
      * Swoole response
      *
-     * @var Swoole\Http\Response
+     * @var Swoole\Http\Response|Swoole\Http2\Response
      */
     private $response;
 
     /**
      * Costructor of Response class
      *
-     * @param SwooleResponse $swooleResponse
+     * @param SwooleResponse|SwooleResponse2 $swooleResponse
      *
      * @return void
      */
-    public function __construct(SwooleResponse $swooleResponse)
+    public function __construct(SwooleResponse|SwooleResponse2 $swooleResponse)
     {
         $this->response = $swooleResponse;
     }
@@ -158,8 +159,26 @@ class Response
      *
      * @return void
      */
-    public function response(array $content, int $code, Request $request, array $headers = []): void
+    public function response(Request $request, array $content, int $code, array $headers = []): void
     {
+        $corsHeader = [];
+
+        if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+            $corsHeader =  [
+                "access-control-allow-credentials" => getenv("ALLOW_CREDENTIALS") ? getenv("ALLOW_CREDENTIALS") : "true",
+                "access-control-allow-origin" => getenv("ALLOW_ORIGIN") ? getenv("ALLOW_ORIGIN") : "*",
+                "access-control-allow-methods" => getenv("ALLOW_METHODS") ? getenv("ALLOW_METHODS") : "*",
+                "access-control-allow-headers" => getenv("ALLOW_HEADERS") ? getenv("ALLOW_HEADERS") : "*",
+                "access-control-max-age" => getenv("MAX_AGE") ? getenv("MAX_AGE") : "0",
+                "access-control-expose-headers" => " ",
+                "Server" => getenv("SERVICE_NAME") ? getenv("SERVICE_NAME") : "gino-app",
+                "vary" => getenv("VARY") ? getenv("VARY") : "Origin",
+                "cache-controll" => getenv("CACHE_CONTROLL") ? getenv("CACHE_CONTROLL") : "private, must-revalidate"
+            ];
+        }
+        
+        $headers = $headers + $corsHeader;
+
         switch ($request->get('response-content-type')['type'] ?? null) {
             case 'json':
                 $this->json(

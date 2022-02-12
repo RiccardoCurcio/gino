@@ -39,7 +39,7 @@ class Routing
      *
      * @return void
      */
-    public function __construct(?array $add = [], ?bool $corsOrigin = false)
+    public function __construct(?array $add = [])
     {
         $this->add = $add;
         $this->routes = [
@@ -54,6 +54,8 @@ class Routing
             "CONNECT"   => []
         ];
        
-        $this->resolveCors($this);
+        if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+            $this->resolveCors($this);
+        }
     }
 }
