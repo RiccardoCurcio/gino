@@ -15,7 +15,9 @@
 namespace Gino\Src\Response;
 
 use Swoole\Http\Response as SwooleResponse;
+use Swoole\Http2\Response as SwooleResponse2;
 use \Gino\Src\Request\Request;
+use \Gino\Src\CorsHeaders\CorsHeaders;
 
 /**
  * Response class
@@ -31,18 +33,18 @@ class Response
     /**
      * Swoole response
      *
-     * @var Swoole\Http\Response
+     * @var Swoole\Http\Response|Swoole\Http2\Response
      */
     private $response;
 
     /**
      * Costructor of Response class
      *
-     * @param SwooleResponse $swooleResponse
+     * @param SwooleResponse|SwooleResponse2 $swooleResponse
      *
      * @return void
      */
-    public function __construct(SwooleResponse $swooleResponse)
+    public function __construct(SwooleResponse|SwooleResponse2 $swooleResponse)
     {
         $this->response = $swooleResponse;
     }
@@ -60,7 +62,26 @@ class Response
     }
 
     /**
-     * Set respomse status code
+     * Set HeadersFromArray
+     *
+     * @param array $contentType
+     *
+     * @return void
+     */
+    public function setHeaders(array $headers): void
+    {
+        $self = $this;
+        array_map(
+            function ($key, $value) use (&$self) {
+                $self->response->header($key, $value);
+            },
+            array_keys($headers),
+            array_values($headers)
+        );
+    }
+
+    /**
+     * Set response status code
      *
      * @param int $code
      *
@@ -83,13 +104,15 @@ class Response
         array $content,
         int $code,
         string $contentType = "application/json",
-        string $charset = null
+        string $charset = null,
+        array $headers = []
     ): void {
 
         $charset = $charset ?? (getenv('CHARSET') == false ? 'utf-8' : getenv('CHARSET'));
 
         $this->setHeaderContentType($contentType . "; charset=" . $charset);
         $this->setResponeStatusCode($code);
+        $this->setHeaders($headers);
         $this->response->end(
             json_encode(
                 $content,
@@ -115,12 +138,14 @@ class Response
         array $content,
         int $code,
         string $contentType = "text/xml",
-        string $charset = null
+        string $charset = null,
+        array $headers = []
     ): void {
         $charset = $charset ?? (getenv('CHARSET') == false ? 'utf-8' : getenv('CHARSET'));
 
         $this->setHeaderContentType($contentType . "; charset=" . $charset);
         $this->setResponeStatusCode($code);
+        $this->setHeaders($headers);
         $this->response->end(
             $this->arrayToXml($content)
         );
@@ -134,15 +159,24 @@ class Response
      *
      * @return void
      */
-    public function response(array $content, int $code, Request $request): void
+    public function response(Request $request, array $content, int $code, array $headers = []): void
     {
+        $corsHeader = [];
+
+        if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+            $corsHeader = CorsHeaders::getCorsHeaders();
+        }
+
+        $headers = $headers + $corsHeader;
+
         switch ($request->get('response-content-type')['type'] ?? null) {
             case 'json':
                 $this->json(
                     $content,
                     $code,
                     $request->get('response-content-type')['content-type'],
-                    getenv('CHARSET') == false ? null : getenv('CHARSET')
+                    getenv('CHARSET') == false ? null : getenv('CHARSET'),
+                    $headers
                 );
                 break;
             case 'xml':
@@ -150,11 +184,18 @@ class Response
                     $content,
                     $code,
                     $request->get('response-content-type')['content-type'],
-                    getenv('CHARSET') == false ? null : getenv('CHARSET')
+                    getenv('CHARSET') == false ? null : getenv('CHARSET'),
+                    $headers
                 );
                 break;
             default:
-                $this->json($content, $code);
+                $this->json(
+                    $content,
+                    $code,
+                    'application/json',
+                    getenv('CHARSET') == false ? null : getenv('CHARSET'),
+                    $headers
+                );
                 break;
         }
     }

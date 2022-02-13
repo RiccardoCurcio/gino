@@ -72,7 +72,7 @@ class Logger extends AbstractLogger
         $STDOUT = fopen("php://stdout", "w");
         fwrite(
             $STDOUT,
-            '[' . $date . '] ' . strtoupper($level) . ' ' . (string) $message. "\n"
+            '[' . $date . '] ' . strtoupper($level) . ' - ' . (string) $message. "\n"
         );
         fclose($STDOUT);
     }

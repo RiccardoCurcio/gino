@@ -30,6 +30,7 @@ class Routing
 
     use \Gino\Src\Routes;
     use \Gino\Src\Runner;
+    use \Gino\Src\CorsOrigin\CorsOrigin;
     
     /**
      * Routing constructor
@@ -47,10 +48,14 @@ class Routing
             "PUT"       => [],
             "PATCH"     => [],
             "DELETE"    => [],
-            "OPTION"    => [],
+            "OPTIONS"    => [],
             "HEAD"      => [],
             "TRACE"     => [],
             "CONNECT"   => []
         ];
+       
+        if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+            $this->resolveCors($this);
+        }
     }
 }
