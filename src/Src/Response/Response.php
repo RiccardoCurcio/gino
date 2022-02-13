@@ -17,6 +17,7 @@ namespace Gino\Src\Response;
 use Swoole\Http\Response as SwooleResponse;
 use Swoole\Http2\Response as SwooleResponse2;
 use \Gino\Src\Request\Request;
+use \Gino\Src\CorsHeaders\CorsHeaders;
 
 /**
  * Response class
@@ -71,17 +72,16 @@ class Response
     {
         $self = $this;
         array_map(
-            function($key, $value) use (&$self) {
+            function ($key, $value) use (&$self) {
                 $self->response->header($key, $value);
             },
             array_keys($headers),
             array_values($headers)
         );
-        
     }
 
     /**
-     * Set respomse status code
+     * Set response status code
      *
      * @param int $code
      *
@@ -164,19 +164,9 @@ class Response
         $corsHeader = [];
 
         if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
-            $corsHeader =  [
-                "access-control-allow-credentials" => getenv("ALLOW_CREDENTIALS") ? getenv("ALLOW_CREDENTIALS") : "true",
-                "access-control-allow-origin" => getenv("ALLOW_ORIGIN") ? getenv("ALLOW_ORIGIN") : "*",
-                "access-control-allow-methods" => getenv("ALLOW_METHODS") ? getenv("ALLOW_METHODS") : "*",
-                "access-control-allow-headers" => getenv("ALLOW_HEADERS") ? getenv("ALLOW_HEADERS") : "*",
-                "access-control-max-age" => getenv("MAX_AGE") ? getenv("MAX_AGE") : "0",
-                "access-control-expose-headers" => " ",
-                "Server" => getenv("SERVICE_NAME") ? getenv("SERVICE_NAME") : "gino-app",
-                "vary" => getenv("VARY") ? getenv("VARY") : "Origin",
-                "cache-controll" => getenv("CACHE_CONTROLL") ? getenv("CACHE_CONTROLL") : "private, must-revalidate"
-            ];
+            $corsHeader = CorsHeaders::getCorsHeaders();
         }
-        
+
         $headers = $headers + $corsHeader;
 
         switch ($request->get('response-content-type')['type'] ?? null) {

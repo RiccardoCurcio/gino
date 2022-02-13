@@ -13,7 +13,7 @@
 
 namespace Gino\Src\CorsOrigin;
 
-
+use Gino\Routing;
 
 
 /**
@@ -27,10 +27,16 @@ namespace Gino\Src\CorsOrigin;
  */
 trait CorsOrigin
 {
-    public static function resolveCors($app) {
+    /**
+     * Add route for prefiht request
+     *
+     * @param [type] $app
+     * @return void
+     */
+    public static function resolveCors(Routing $app) {
         
         $app->options(
-            "/{tail.*}/{suca}",
+            "/{tail.*}",
             '\Gino\Src\CorsController\CorsController'::class,
             'resolve',
             []

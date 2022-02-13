@@ -136,7 +136,7 @@ $server->on(
 
 $server->start();
 ```
-doc to do
+doc todo
 - route tail.*
 - cors resolve
 - dependencies resolve
