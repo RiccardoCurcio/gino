@@ -102,14 +102,13 @@ trait Matcher
         $routeSplit = explode('/', $routeUri);
         $uriSplit = explode('/', $requestUri);
 
-        array_map(
-            function ($key, $value) use (&$request, &$uriSplit, $regex) {
+        array_walk(
+            $routeSplit,
+            function ($value, $key) use (&$request, &$uriSplit, $regex) {
                 if (preg_match_all($regex, $value, $matches, PREG_SET_ORDER) > 0) {
                     $request->set($matches[0][1], $uriSplit[$key]);
                 }
-            },
-            array_keys($routeSplit),
-            array_values($routeSplit)
+            }
         );
     }
 
@@ -123,13 +122,7 @@ trait Matcher
      */
     public static function setHeaders(Request $request, array $header): void
     {
-        array_map(
-            function ($key, $value) use (&$request) {
-                $request->set(Matcher::normalizeHeaderKey($key), $value);
-            },
-            array_keys($header),
-            array_values($header)
-        );
+        array_walk($header, fn ($value, $key) => $request->set(Matcher::normalizeHeaderKey($key), $value));
     }
 
     /**
@@ -154,13 +147,7 @@ trait Matcher
     public static function setQueryString(Request $request, ?array $get = null): void
     {
         if ($get) {
-            array_map(
-                function ($key, $value) use (&$request) {
-                    $request->set($key, $value);
-                },
-                array_keys($get),
-                array_values($get)
-            );
+            array_walk($get, fn ($value, $key) => $request->set($key, $value));
         }
     }
 

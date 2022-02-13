@@ -70,14 +70,7 @@ class Response
      */
     public function setHeaders(array $headers): void
     {
-        $self = $this;
-        array_map(
-            function ($key, $value) use (&$self) {
-                $self->response->header($key, $value);
-            },
-            array_keys($headers),
-            array_values($headers)
-        );
+        array_walk($headers, fn ($value, $key) => $this->response->header($key, $value));
     }
 
     /**
