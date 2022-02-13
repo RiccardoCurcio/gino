@@ -172,14 +172,14 @@ trait Routes
      *
      * @return void
      */
-    public function option(
+    public function options(
         string $uri,
         string $className,
         string $method,
         array $middlewares = []
     ) : void {
         array_push(
-            $this->routes["OPTION"],
+            $this->routes["OPTIONS"],
             [
                 "uri" => $uri,
                 "className" => DependencyInjection::containers($className),

@@ -9,7 +9,142 @@ Simple json api framework over swoole for php microservice
 * load env file
 * resolve dependency injection
 * versionig type (URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER)
+* resolve cors-origin
 
+## DOC
+
+### Define env file
+
+```
+# SERVER
+SERVICE_NAME=gino-app
+HOST=127.0.0.1
+PORT=8082
+CHARSET=utf-8
+
+# Versioning Settings [URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER]
+
+# Ex. URI
+# VERSIONING_TYPE=URI
+
+# Ex. QUERYSTRING
+# VERSIONING_TYPE=QUERYSTRING
+# VERSIONING_KEY=version
+
+
+# Ex. CUSTOM_HEADER
+VERSIONING_TYPE=CUSTOM_HEADER
+HEADER_KEY=Api-version
+VERSIONING_KEY=version
+
+# Ex. ACCEPT_HEADER
+# VERSIONING_TYPE=ACCEPT_HEADER
+# VERSIONING_ALLOWED_RESPONSE_TYPE=json,xml
+
+
+# CORSS_ORIGIN
+CORSS_ORIGIN_RESOLVE=true
+ALLOW_CREDENTIALS=true
+ALLOW_ORIGIN=https://gino-app.local
+ALLOW_METHODS=POST, GET, PUT, PATCH, DELETE, OPTIONS
+ALLOW_HEADERS=Content-Type
+MAX_AGE=86400
+VARY=Origin
+CACHE_CONTROLL=private, must-revalidate
+```
+
+### Load env
+
+```php
+Gino\LoadEnv::load('.');
+```
+
+### Define app
+```php
+/**
+ * Routing constructor
+ *
+ * @param array|null $add
+ *
+ * @return void
+ */
+public function __construct(?array $add = [])
+```
+
+```php
+use Gino\Routing;
+
+$app = new Routing(["key" => "value"]);
+```
+
+### Declare routes
+methods : GET POST PUT PATCH DELETE OPTIONS HEAD TRACE CONNECT
+```php
+$app->get(
+    '/v1/example',
+    '\App\Controllers\ExampleController'::class,
+    'run',
+    [\App\Middlewares\ExampleMiddleware::class]
+);
+
+$app->post(
+    '/v1/example/{parmName}',
+    '\App\Controllers\ExampleController'::class,
+    'run',
+    []
+);
+```
+
+## Init http server
+```php
+$server = new SwoolServer(getenv("HOST"), getenv("PORT"));
+```
+
+## Init https server (http/2)
+```php
+$server = new SwoolServer(getenv("HOST"), getenv("PORT"), SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
+$server->set(
+    [
+        'ssl_cert_file' => 'ssl.crt',
+        'ssl_key_file' => 'ssl.key',
+    ]
+);
+```
+### for local test you can generate key and cert
+```bash
+$ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+    -keyout ssl.key -out ssl.crt -subj "/CN=localhost.local" \
+    -addext "subjectAltName=DNS:localhost.local.com,DNS:www.localhost.local,IP:127.0.0.1"
+```
+
+## Start server
+```php
+$server->on(
+    "start",
+    function (SwoolServer $server) {
+        $logger = new Logger();
+        $logger->info("Server http://" . $server->host . ":" . $server->port);
+    }
+);
+
+$server->on(
+    "request",
+    function (SwooleRequest|SwooleRequest2 $request, SwooleResponse|SwooleResponse2 $response) use ($app) {
+        $app->run($request, $response);
+    }
+);
+
+$server->start();
+```
+doc todo
+- route tail.*
+- cors resolve
+- dependencies resolve
+- http excepitions
+- gino request
+- gino response
+- xml ?
+- events foked process
 
 ## Create example app
 
@@ -107,7 +242,7 @@ $server->on(
 $server->start();
 ```
 
-## Create routes
+## Create routes group
 ```
 mkdir app/Routes
 mkdir app/Routes/HealtCheck
@@ -269,7 +404,7 @@ class HealtCheckGetController extends Controller
 {
 
     /**
-     * Undocumented variable
+     * Logger
      *
      * @var [type]
      */
@@ -279,21 +414,20 @@ class HealtCheckGetController extends Controller
     /**
      * Costructor HealtCheckGetController
      *
-     * @param \Psr\Log\LoggerInterface                                                  $logger
+     * @param \Psr\Log\LoggerInterface      $logger
      *
-     * @dependency Gino\Src\Logger\Logger                                           $logger
+     * @dependency Gino\Src\Logger\Logger   $logger
      */
-    public function __construct(
-        LoggerInterface $logger
-    ) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
     /**
      * Check methods
      *
-     * @param \Gino\Src\Request\Request  $request
-     * @param \Gino\Src\Response\Response $response
+     * @param \Gino\Src\Request\Request     $request
+     * @param \Gino\Src\Response\Response   $response
      *
      * @return void
      */
@@ -302,11 +436,11 @@ class HealtCheckGetController extends Controller
         $this->logger->info("HealtCheckGetController v1");
 
         $response->response(
+            $request,
             [
                 "msg" => ["example" => "check get"]
             ],
-            200,
-            $request
+            200
         );
     }
 }
@@ -366,33 +500,33 @@ class HealtCheckPostController extends Controller
     /**
      * Costructor HealtCheckPostController
      *
-     * @param \Psr\Log\LoggerInterface                                                  $logger
+     * @param \Psr\Log\LoggerInterface      $logger
      *
-     * @dependency Gino\Src\Logger\Logger                                           $logger
+     * @dependency Gino\Src\Logger\Logger   $logger
      */
-    public function __construct(
-        LoggerInterface $logger
-    ) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
     /**
      * Check methods
      *
-     * @param \Gino\Src\Request\Request  $request
-     * @param \Gino\Src\Response\Response $response
+     * @param \Gino\Src\Request\Request     $request
+     * @param \Gino\Src\Response\Response   $response
      *
      * @return void
      */
     public function check(Request $request, Response $response)
     {
         $this->logger->info("HealtCheckPostController v1");
+
         $response->response(
+            $request
             [
                 "msg" => ["example" => "check post"]
             ],
-            201,
-            $request
+            201
         );
     }
 }
@@ -513,3 +647,6 @@ body
 	    "data": "example"
     }
 ```
+
+# Author
+Riccardo Curcio
