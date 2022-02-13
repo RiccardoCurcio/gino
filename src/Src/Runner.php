@@ -82,10 +82,13 @@ trait Runner
      */
     private function middelwareRun(array $middlewares, Request $request): void
     {
-        foreach ($middlewares as $middleware) {
-            if (new $middleware() instanceof \Gino\Src\Middleware\Middleware) {
-                $middleware::run($request);
+        array_walk(
+            $middlewares,
+            function ($middleware) use (&$request) {
+                if (new $middleware() instanceof \Gino\Src\Middleware\Middleware) {
+                    $middleware::run($request);
+                }
             }
-        }
+        );
     }
 }
