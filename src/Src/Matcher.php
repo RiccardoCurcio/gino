@@ -126,7 +126,7 @@ trait Matcher
     }
 
     /**
-     * Undocumented function
+     * Normalize header key
      *
      * @param string $key
      * @return string

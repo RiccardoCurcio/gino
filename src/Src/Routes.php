@@ -31,8 +31,8 @@ trait Routes
      * Set GET route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -59,8 +59,8 @@ trait Routes
      * Set POST route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -86,8 +86,8 @@ trait Routes
      * Set PUT route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -113,8 +113,8 @@ trait Routes
      * Set PATCH route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -140,8 +140,8 @@ trait Routes
      * Set DELETE route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -167,8 +167,8 @@ trait Routes
      * Set OPTION route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -194,8 +194,8 @@ trait Routes
      * Set HEAD route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -221,8 +221,8 @@ trait Routes
      * Set TRACE route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
@@ -248,8 +248,8 @@ trait Routes
      * Set CONNECT route
      *
      * @param string $uri
-     * @param string $className
-     * @param string $method
+     * @param string|Process $className
+     * @param string|array $method
      * @param array  $middlewares
      *
      * @return void
