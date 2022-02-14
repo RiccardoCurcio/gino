@@ -5,14 +5,20 @@ Simple json api framework over swoole for php microservice
 *[open-swoole](https://openswoole.com/)*
 
 ## Features
-* routing system
+* routing system OOP or Pipeline
+    * declare routes
+    * use pipeline
 * load env file
 * resolve dependency injection
 * versionig type (URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER)
 * resolve cors-origin
+* Process
+    * asyncPipeline
+    * syncPipeline
+    * asyncStorm 
 
-## DOC
-
+# DOC
+## Env file
 ### Define env file
 
 ```
@@ -52,13 +58,13 @@ MAX_AGE=86400
 VARY=Origin
 CACHE_CONTROLL=private, must-revalidate
 ```
-
+## Env
 ### Load env
 
 ```php
 Gino\LoadEnv::load('.');
 ```
-
+## App
 ### Define app
 ```php
 /**
@@ -76,10 +82,15 @@ use Gino\Routing;
 
 $app = new Routing(["key" => "value"]);
 ```
-
+## Routes
 ### Declare routes
 methods : GET POST PUT PATCH DELETE OPTIONS HEAD TRACE CONNECT
 ```php
+
+.
+.
+.
+
 $app->get(
     '/v1/example',
     '\App\Controllers\ExampleController'::class,
@@ -93,14 +104,65 @@ $app->post(
     'run',
     []
 );
+
 ```
 
-## Init http server
+### Use pipeline
+
+```php
+use Gino\Src\Process\Process;
+use Gino\Src\Logger\Logger;
+
+.
+.
+.
+
+$logger = new Logger();
+
+$callback1 = function(mixed $input) use (&$logger)  {
+    $logger = new Logger();
+    $logger->info("Process CB1 Start");
+    $input["data"] = 1;
+    $logger->info("Process CB1 Finish");
+    return $input;
+};
+
+$callback2 = function(mixed $input) use (&$logger)  {
+    $logger = new Logger();
+    $logger->info("CB2 Start calback");
+    $input["data"] = $input["data"] + 1;
+    $logger->info("CB2 Finish calback");
+    return $input;
+};
+
+$callback3 = function(mixed $input) use (&$logger)  {
+    $logger = new Logger();
+    $logger->info("CB3 Start calback");
+    $input["data"] = $input["data"] + 1;
+    $logger->info("CB3 Finish calback");
+    $input["response"]->response(
+        $input["request"],
+        [
+            "msg" => $input["data"]
+        ],
+        200
+    );
+};
+
+$app->get(
+    'v1/process',
+    Process::class,
+    [$callback1, $callback2, $callback3]
+);
+
+```
+## Server
+### Init http server
 ```php
 $server = new SwoolServer(getenv("HOST"), getenv("PORT"));
 ```
 
-## Init https server (http/2)
+### Init https server (http/2)
 ```php
 $server = new SwoolServer(getenv("HOST"), getenv("PORT"), SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
 $server->set(
@@ -110,14 +172,14 @@ $server->set(
     ]
 );
 ```
-### for local test you can generate key and cert
+#### for local test you can generate key and cert
 ```bash
 $ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
     -keyout ssl.key -out ssl.crt -subj "/CN=localhost.local" \
     -addext "subjectAltName=DNS:localhost.local.com,DNS:www.localhost.local,IP:127.0.0.1"
 ```
 
-## Start server
+### Start server
 ```php
 $server->on(
     "start",
@@ -136,6 +198,93 @@ $server->on(
 
 $server->start();
 ```
+
+## Process
+### AsyncPipeline
+```php
+use Gino\Src\Logger\Logger;
+use Gino\Src\Process\Process;
+
+$logger = new Logger();
+$callback1 = function(mixed $input) use (&$logger) {
+    $logger->info("CB1 Start calback");
+    // your code
+    $logger->info("CB1 Finish calback");
+    return " cb1";
+};
+
+$callback2 = function(mixed $input) use (&$logger) {
+    $logger->info("CB2 Start calback");
+    // your code
+    $logger->info("CB2 Finish calback");
+    return "cb2";
+};
+
+$callback3 = function(mixed $input) use (&$logger) {
+    $logger->info("CB3 Start calback");
+    // your code
+    $logger->info("CB3 Finish calback");
+    return "cb3";
+};
+
+Process::asyncPipeline('input', [$callback1, $callback2, $callback3]);
+```
+### SyncPipeline
+```php
+use Gino\Src\Logger\Logger;
+use Gino\Src\Process\Process;
+
+$logger = new Logger();
+$callback1 = function(mixed $input) use (&$logger) {
+    $logger->info("CB1 Start calback");
+    // your code
+    $logger->info("CB1 Finish calback");
+    return " cb1";
+};
+
+$callback2 = function(mixed $input) use (&$logger) {
+    $logger->info("CB2 Start calback");
+    // your code
+    $logger->info("CB2 Finish calback");
+    return "cb2";
+};
+
+$callback3 = function(mixed $input) use (&$logger) {
+    $logger->info("CB3 Start calback");
+    // your code
+    $logger->info("CB3 Finish calback");
+    return "cb3";
+};
+
+$result = Process::syncPipeline('input', [$callback1, $callback2, $callback3]);
+```
+### AsyncStorm
+```php
+use Gino\Src\Logger\Logger;
+use Gino\Src\Process\Process;
+
+$logger = new Logger();
+$callbackStorm1 = function() {
+    $logger->info("CB1 Start calback");
+    // your code
+    $logger->info("CB1 Finish calback");
+};
+
+$callbackStorm2 = function() {
+    $logger->info("CB2 CB2 Start calback");
+    // your code
+    $logger->info("CB2 Finish calback");
+};
+
+$callbackStorm3 = function() {
+    $logger->info("CB3 CB3 Start calback");
+    // your code
+    $logger->info("CB3 Finish calback");
+};
+
+Process::asyncStorm([$callbackStorm1, $callbackStorm2, $callbackStorm3]);
+```
+
 doc todo
 - route tail.*
 - cors resolve
@@ -144,7 +293,7 @@ doc todo
 - gino request
 - gino response
 - xml ?
-- events foked process
+- process
 
 ## Create example app
 
