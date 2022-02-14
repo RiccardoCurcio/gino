@@ -271,8 +271,13 @@ trait Routes
         );
     }
 
+    /**
+     * Check is a process
+     *
+     * @param mixed $process
+     * @return boolean
+     */
     public static function isProcess(mixed $process) : bool {
-        var_dump($process);
-        return $process == Process::class ? true : false;
+        return $process == Process::class;
     }
 }
