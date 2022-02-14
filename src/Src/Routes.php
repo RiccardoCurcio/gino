@@ -13,6 +13,7 @@
 namespace Gino\Src;
 
 use \Gino\Src\DependencyInjection\DependencyInjection;
+use Gino\Src\Process\Process;
 
 /**
  * Routes trait
@@ -38,8 +39,8 @@ trait Routes
      */
     public function get(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         
@@ -47,7 +48,7 @@ trait Routes
             $this->routes["GET"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -66,15 +67,15 @@ trait Routes
      */
     public function post(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["POST"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -93,15 +94,15 @@ trait Routes
      */
     public function put(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["PUT"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -120,15 +121,15 @@ trait Routes
      */
     public function patch(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["PATCH"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -147,15 +148,15 @@ trait Routes
      */
     public function delete(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["DELETE"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -174,15 +175,15 @@ trait Routes
      */
     public function options(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["OPTIONS"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -201,15 +202,15 @@ trait Routes
      */
     public function head(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["HEAD"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -228,15 +229,15 @@ trait Routes
      */
     public function trace(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["TRACE"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -255,18 +256,23 @@ trait Routes
      */
     public function connet(
         string $uri,
-        string $className,
-        string $method,
+        string|Process $className,
+        string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
             $this->routes["CONNET"],
             [
                 "uri" => $uri,
-                "className" => DependencyInjection::containers($className),
+                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
         );
+    }
+
+    public static function isProcess(mixed $process) : bool {
+        var_dump($process);
+        return $process == Process::class ? true : false;
     }
 }

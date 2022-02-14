@@ -21,6 +21,7 @@ use Swoole\Http2\Response as SwooleResponse2;
 use Gino\Src\Request\Request;
 use Gino\Src\Response\Response;
 use \Gino\Src\CorsHeaders\CorsHeaders;
+use Gino\Src\Process\Process;
 
 /**
  * Runner trait
@@ -34,6 +35,7 @@ use \Gino\Src\CorsHeaders\CorsHeaders;
 trait Runner
 {
     use \Gino\Src\Matcher;
+
 
     /**
      * Run method
@@ -52,14 +54,21 @@ trait Runner
             $worker = Matcher::match($httpRequest, $this->routes);
             $worker ? $worker['request']->set('add', $this->add) : null;
             $this->middelwareRun($worker['middlewares'], $worker['request']);
-            $worker['class']->{$worker['method']}($worker['request'], $response);
+
+            $worker['class'] == "process" ? Process::syncPipeline(
+                [
+                    "request" => $worker['request'],
+                    "response" => $response
+                ],
+                $worker['method']
+            ) : $worker['class']->{$worker['method']}($worker['request'], $response);
         } catch (\Exception $ex) {
             $corsHeader = [];
 
             if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
                 $corsHeader = CorsHeaders::getCorsHeaders();
             }
-            
+
             $response->json(
                 [
                     "msg" => $ex->__toString()
