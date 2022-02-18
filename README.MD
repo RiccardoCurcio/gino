@@ -156,7 +156,7 @@ $app->get(
 );
 
 ```
-## Server
+## Server (SWOOLE)
 ### Init http server
 ```php
 $server = new SwoolServer(getenv("HOST"), getenv("PORT"));
@@ -224,7 +224,6 @@ $callback3 = function(mixed $input) use (&$logger) {
     $logger->info("CB3 Start calback");
     // your code
     $logger->info("CB3 Finish calback");
-    return "cb3";
 };
 
 Process::asyncPipeline('input', [$callback1, $callback2, $callback3]);
