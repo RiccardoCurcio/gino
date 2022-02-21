@@ -48,7 +48,7 @@ trait Routes
             $this->routes["GET"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -75,7 +75,7 @@ trait Routes
             $this->routes["POST"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -102,7 +102,7 @@ trait Routes
             $this->routes["PUT"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -129,7 +129,7 @@ trait Routes
             $this->routes["PATCH"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -156,7 +156,7 @@ trait Routes
             $this->routes["DELETE"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -183,7 +183,7 @@ trait Routes
             $this->routes["OPTIONS"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -210,7 +210,7 @@ trait Routes
             $this->routes["HEAD"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -237,7 +237,7 @@ trait Routes
             $this->routes["TRACE"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -264,7 +264,7 @@ trait Routes
             $this->routes["CONNET"],
             [
                 "uri" => $uri,
-                "className" => Routes::isProcess($className) ? "process" : DependencyInjection::containers($className),
+                "className" => $this->isProcess($className) ? "process" : DependencyInjection::containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
