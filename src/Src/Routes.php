@@ -12,7 +12,7 @@
  */
 namespace Gino\Src;
 
-use \Gino\Src\DependencyInjection\DependencyInjection;
+
 use Gino\Src\Process\Process;
 
 /**
@@ -26,7 +26,7 @@ use Gino\Src\Process\Process;
  */
 trait Routes
 {
-    
+    use \Gino\Src\DependencyInjection\DependencyInjection;
     /**
      * Set GET route
      *
