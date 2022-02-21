@@ -40,15 +40,15 @@ trait Matcher
      *
      * @return array|null
      */
-    public static function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes): ?array
+    public function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes): ?array
     {
         $request = new request();
         $request->set("gino-request-code", uniqid('GINO-', true));
         $request->set("swoole", $httpRequest);
 
-        Matcher::setHeaders($request, $httpRequest->header);
-        Matcher::setQueryString($request, $httpRequest->get);
-        $uri = Matcher::setVersion($request, $httpRequest->server["request_uri"]);
+        $this->setHeaders($request, $httpRequest->header);
+        $this->setQueryString($request, $httpRequest->get);
+        $uri = $this->setVersion($request, $httpRequest->server["request_uri"]);
         $all = false;
         foreach ($routes[$httpRequest->getMethod()] as $value) {
             $regex = str_replace("/", "\\/", $value["uri"]);
@@ -64,14 +64,14 @@ trait Matcher
 
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
                 if (!$all) {
-                    Matcher::setParam(
+                    $this->setParam(
                         $request,
                         $value["uri"],
                         $uri
                     );
                 }
 
-                Matcher::setBody($request, $httpRequest);
+                $this->setBody($request, $httpRequest);
                 return [
                     "class" => $value["className"],
                     "method" => $value["method"],
@@ -122,7 +122,7 @@ trait Matcher
      */
     public static function setHeaders(Request $request, array $header): void
     {
-        array_walk($header, fn ($value, $key) => $request->set(Matcher::normalizeHeaderKey($key), $value));
+        array_walk($header, fn ($value, $key) => $request->set($this->normalizeHeaderKey($key), $value));
     }
 
     /**
@@ -177,7 +177,7 @@ trait Matcher
      * @param string $uri
      * @return string
      */
-    public static function setVersion(Request $request, string $uri): string
+    public function setVersion(Request $request, string $uri): string
     {
         switch (getenv('VERSIONING_TYPE', 'URI')) {
             case 'QUERYSTRING':
@@ -190,7 +190,7 @@ trait Matcher
             case 'ACCEPT_HEADER':
                 $accept = $request->get('Accept');
                 $service = 'application/vnd.' . explode(":", $request->get('Host'))[0];
-                $versionType = Matcher::strstrAfter($accept, $service . '.');
+                $versionType = $this->strstrAfter($accept, $service . '.');
                 $uri =  '/' . $versionType['version'] . $uri;
 
                 in_array(

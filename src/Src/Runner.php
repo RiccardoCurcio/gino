@@ -51,7 +51,7 @@ trait Runner
     ): void {
         $response = new Response($httpResponse);
         try {
-            $worker = Matcher::match($httpRequest, $this->routes);
+            $worker = $this->match($httpRequest, $this->routes);
             $worker ? $worker['request']->set('add', $this->add) : null;
             $this->middelwareRun($worker['middlewares'], $worker['request']);
 
