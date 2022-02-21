@@ -120,9 +120,10 @@ trait Matcher
      *
      * @return void
      */
-    public static function setHeaders(Request $request, array $header): void
+    public function setHeaders(Request $request, array $header): void
     {
-        array_walk($header, fn ($value, $key) => $request->set($this->normalizeHeaderKey($key), $value));
+        $self = $this;
+        array_walk($header, fn ($value, $key) => $request->set($self->normalizeHeaderKey($key), $value));
     }
 
     /**
