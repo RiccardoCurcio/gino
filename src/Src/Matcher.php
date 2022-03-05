@@ -40,15 +40,15 @@ trait Matcher
      *
      * @return array|null
      */
-    public static function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes): ?array
+    public function match(SwooleRequest|SwooleRequest2 $httpRequest, array $routes): ?array
     {
         $request = new request();
         $request->set("gino-request-code", uniqid('GINO-', true));
         $request->set("swoole", $httpRequest);
 
-        Matcher::setHeaders($request, $httpRequest->header);
-        Matcher::setQueryString($request, $httpRequest->get);
-        $uri = Matcher::setVersion($request, $httpRequest->server["request_uri"]);
+        $this->setHeaders($request, $httpRequest->header);
+        $this->setQueryString($request, $httpRequest->get);
+        $uri = $this->setVersion($request, $httpRequest->server["request_uri"]);
         $all = false;
         foreach ($routes[$httpRequest->getMethod()] as $value) {
             $regex = str_replace("/", "\\/", $value["uri"]);
@@ -64,14 +64,14 @@ trait Matcher
 
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
                 if (!$all) {
-                    Matcher::setParam(
+                    $this->setParam(
                         $request,
                         $value["uri"],
                         $uri
                     );
                 }
 
-                Matcher::setBody($request, $httpRequest);
+                $this->setBody($request, $httpRequest);
                 return [
                     "class" => $value["className"],
                     "method" => $value["method"],
@@ -102,14 +102,13 @@ trait Matcher
         $routeSplit = explode('/', $routeUri);
         $uriSplit = explode('/', $requestUri);
 
-        array_map(
-            function ($key, $value) use (&$request, &$uriSplit, $regex) {
+        array_walk(
+            $routeSplit,
+            function ($value, $key) use (&$request, &$uriSplit, $regex) {
                 if (preg_match_all($regex, $value, $matches, PREG_SET_ORDER) > 0) {
                     $request->set($matches[0][1], $uriSplit[$key]);
                 }
-            },
-            array_keys($routeSplit),
-            array_values($routeSplit)
+            }
         );
     }
 
@@ -121,19 +120,14 @@ trait Matcher
      *
      * @return void
      */
-    public static function setHeaders(Request $request, array $header): void
+    public function setHeaders(Request $request, array $header): void
     {
-        array_map(
-            function ($key, $value) use (&$request) {
-                $request->set(Matcher::normalizeHeaderKey($key), $value);
-            },
-            array_keys($header),
-            array_values($header)
-        );
+        $self = $this;
+        array_walk($header, fn ($value, $key) => $request->set($self->normalizeHeaderKey($key), $value));
     }
 
     /**
-     * Undocumented function
+     * Normalize header key
      *
      * @param string $key
      * @return string
@@ -154,13 +148,7 @@ trait Matcher
     public static function setQueryString(Request $request, ?array $get = null): void
     {
         if ($get) {
-            array_map(
-                function ($key, $value) use (&$request) {
-                    $request->set($key, $value);
-                },
-                array_keys($get),
-                array_values($get)
-            );
+            array_walk($get, fn ($value, $key) => $request->set($key, $value));
         }
     }
 
@@ -190,7 +178,7 @@ trait Matcher
      * @param string $uri
      * @return string
      */
-    public static function setVersion(Request $request, string $uri): string
+    public function setVersion(Request $request, string $uri): string
     {
         switch (getenv('VERSIONING_TYPE', 'URI')) {
             case 'QUERYSTRING':
@@ -203,7 +191,7 @@ trait Matcher
             case 'ACCEPT_HEADER':
                 $accept = $request->get('Accept');
                 $service = 'application/vnd.' . explode(":", $request->get('Host'))[0];
-                $versionType = Matcher::strstrAfter($accept, $service . '.');
+                $versionType = $this->strstrAfter($accept, $service . '.');
                 $uri =  '/' . $versionType['version'] . $uri;
 
                 in_array(

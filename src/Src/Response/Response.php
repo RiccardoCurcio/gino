@@ -17,7 +17,7 @@ namespace Gino\Src\Response;
 use Swoole\Http\Response as SwooleResponse;
 use Swoole\Http2\Response as SwooleResponse2;
 use \Gino\Src\Request\Request;
-use \Gino\Src\CorsHeaders\CorsHeaders;
+
 
 /**
  * Response class
@@ -30,6 +30,8 @@ use \Gino\Src\CorsHeaders\CorsHeaders;
  */
 class Response
 {
+    use \Gino\Src\CorsHeaders\CorsHeaders;
+    
     /**
      * Swoole response
      *
@@ -70,14 +72,7 @@ class Response
      */
     public function setHeaders(array $headers): void
     {
-        $self = $this;
-        array_map(
-            function ($key, $value) use (&$self) {
-                $self->response->header($key, $value);
-            },
-            array_keys($headers),
-            array_values($headers)
-        );
+        array_walk($headers, fn ($value, $key) => $this->response->header($key, $value));
     }
 
     /**
@@ -164,7 +159,7 @@ class Response
         $corsHeader = [];
 
         if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
-            $corsHeader = CorsHeaders::getCorsHeaders();
+            $corsHeader = $this->getCorsHeaders();
         }
 
         $headers = $headers + $corsHeader;
