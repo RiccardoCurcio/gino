@@ -30,7 +30,7 @@ trait DependencyInjection
      * @param string $className
      * @return object
      */
-    public static function containers(string $className) : object
+    public function containers(string $className) : object
     {
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
@@ -38,7 +38,7 @@ trait DependencyInjection
         if ($reflection->isInstantiable()) {
             $dependenciesArray = [];
             foreach ($constructor->getParameters() as $value) {
-                $dependency = DependencyInjection::getHint(
+                $dependency = $this->getHint(
                     $constructor->getDocComment(),
                     $value->name
                 );
@@ -51,7 +51,7 @@ trait DependencyInjection
                         if (count($constructorDep->getParameters()) > 0) {
                             array_push(
                                 $dependenciesArray,
-                                DependencyInjection::containers($dependency)
+                                $this->containers($dependency)
                             );
                         } else {
                             array_push(
