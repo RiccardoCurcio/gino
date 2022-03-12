@@ -20,7 +20,7 @@ use Swoole\Http2\Request as SwooleRequest2;
 use Swoole\Http2\Response as SwooleResponse2;
 use Gino\Src\Request\Request;
 use Gino\Src\Response\Response;
-use \Gino\Src\CorsHeaders\CorsHeaders;
+// use \Gino\Src\CorsHeaders\CorsHeaders;
 use Gino\Src\Process\Process;
 
 /**
@@ -66,7 +66,7 @@ trait Runner
             $corsHeader = [];
 
             if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
-                $corsHeader = CorsHeaders::getCorsHeaders();
+                $corsHeader = $this->getCorsHeaders();
             }
 
             $response->json(

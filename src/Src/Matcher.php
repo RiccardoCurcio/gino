@@ -101,7 +101,8 @@ trait Matcher
         $regex = "/{(.*?)}/m";
         $routeSplit = explode('/', $routeUri);
         $uriSplit = explode('/', $requestUri);
-
+        $routeUri[0] == '/' ? array_shift($routeSplit) : null;
+        $requestUri[0] == '/' ? array_shift($uriSplit) : null;
         array_walk(
             $routeSplit,
             function ($value, $key) use (&$request, &$uriSplit, $regex) {
