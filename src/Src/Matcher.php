@@ -57,10 +57,11 @@ trait Matcher
                 $all = true;
             }
             while (preg_match("/{.*?}/m", $regex)) {
-                $regex = preg_replace("/{.*?}/m", "[^?]*", $regex);
+                $regex = preg_replace("/{.*?}/m", "[^+][^\/]+", $regex);
             }
 
             $regex = "/" . $regex . "$/m";
+            var_dump($regex);
 
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
                 if (!$all) {
