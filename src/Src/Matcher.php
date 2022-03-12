@@ -57,7 +57,7 @@ trait Matcher
                 $all = true;
             }
             while (preg_match("/{.*?}/m", $regex)) {
-                $regex = preg_replace("/{.*?}/m", "[^+][^\/]+", $regex);
+                $regex = preg_replace("/{.*?}/m", "[^\/]+", $regex);
             }
 
             $regex = "/" . $regex . "$/m";
