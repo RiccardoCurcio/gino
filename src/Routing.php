@@ -31,6 +31,7 @@ class Routing
     use \Gino\Src\Routes;
     use \Gino\Src\Runner;
     use \Gino\Src\CorsOrigin\CorsOrigin;
+    use \Gino\Src\CorsHeaders\CorsHeaders;
     
     /**
      * Routing constructor
