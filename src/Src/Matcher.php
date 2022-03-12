@@ -61,7 +61,6 @@ trait Matcher
             }
 
             $regex = "/" . $regex . "$/m";
-            var_dump($regex);
 
             if (preg_match_all($regex, $uri, $matches, PREG_SET_ORDER)) {
                 if (!$all) {
