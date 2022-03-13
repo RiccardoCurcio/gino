@@ -18,7 +18,7 @@ namespace Gino\Src\CorsController;
 use \Gino\Src\Request\Request;
 use \Gino\Src\Response\Response;
 use \Psr\Log\LoggerInterface;
-use \Gino\Src\CorsHeaders\CorsHeaders;
+
 
 /**
  * CorsController
@@ -31,6 +31,7 @@ use \Gino\Src\CorsHeaders\CorsHeaders;
  */
 class CorsController
 {
+    use \Gino\Src\CorsHeaders\CorsHeaders;
 
     /**
      * Undocumented variable
@@ -63,7 +64,7 @@ class CorsController
     {
         $this->logger->info("Resolve cors");
 
-        $corsHeaders = CorsHeaders::getCorsHeaders();
+        $corsHeaders = $this->getCorsHeaders();
         
         $response->response(
             $request,
