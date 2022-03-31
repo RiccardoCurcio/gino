@@ -1,5 +1,5 @@
 <?php
-
+declare(ticks=1);
 /**
  * Process
  *
@@ -41,25 +41,59 @@ class Process
         $logger = new Logger();
         $logger->debug("AsyncPipeline parent pid:" . posix_getpid());
 
+        $childCount = 0;
+
+        pcntl_signal(SIGCHLD, function($sig) use (&$logger) {
+            if ($sig == 9 || $sig == 17) {
+                // $childCount--;
+                $logger->debug( 'ppkill parent/child');
+                exit;
+            }
+        });
+        
+       
         $pid = pcntl_fork();
 
         if (!$pid) {
-            array_walk($callbacks, function ($value) use (&$logger, &$input) {
+            $listOfChild = [];
+            pcntl_signal(SIGCHLD, function($sig) use (&$childCount, &$logger) {
+                if ($sig == 9 || $sig == 17) {
+                    // $childCount--;
+                    $logger->debug( '--- ' . $childCount);
+                    posix_kill(posix_getppid(), SIGKILL);
+                    exit;
+                }
+            });
+            array_walk($callbacks, function ($value) use (&$logger, &$input, &$childCount, &$listOfChild) {
                 $pidPipeline = pcntl_fork();
                 if ($pidPipeline == -1) {
                     $logger->error("AsyncPipeline erroe");
                 }
                 if ($pidPipeline == 0) {
                     $logger->debug("AsyncPipeline child process pid:" . posix_getpid());
+                    array_push($listOfChild, posix_getpid());
+                    $childCount = $childCount + 1;
                     $input = $value($input);
+                    
+                    
                 }
                 if ($pidPipeline > 0) {
                     pcntl_wait($status);
                 }
             });
+            array_walk($listOfChild, function($pid) use (&$childCount, &$logger){
+                $logger->debug($childCount);
+                $childCount = $childCount -1;
+                posix_kill($pid, SIGKILL);
+                // if ($childCount == 0) {
+                //     $logger->debug(posix_getppid());
+                //     posix_kill(posix_getppid(), SIGKILL);
+                // }
+            });
             $info = array();
             pcntl_sigwaitinfo(array(SIGHUP), $info);
         }
+
     }
 
     /**
@@ -73,18 +107,31 @@ class Process
     {
         $logger = new Logger();
         $logger->debug("SyncPipeline parent pid:" . posix_getpid());
-        array_walk($callbacks, function ($value) use (&$logger, &$input) {
+        $listOfChild = [];
+        
+        pcntl_signal(SIGCHLD, function($sig) {
+            if ($sig == 9 || $sig == 17) {
+                exit;
+            }
+        });
+
+        array_walk($callbacks, function ($value) use (&$logger, &$input, &$listOfChild) {
             $pidPipeline = pcntl_fork();
             if ($pidPipeline == -1) {
                 $logger->error("SyncPipeline erroe");
             }
             if ($pidPipeline == 0) {
                 $logger->debug("syncPipeline child pid:" . posix_getpid());
+                array_push($listOfChild, posix_getpid());
                 $input = $value($input);
             }
             if ($pidPipeline > 0) {
-                pcntl_wait($status);
+                pcntl_wait($status, WUNTRACED);
             }
+        });
+
+        array_walk($listOfChild, function($pid) {
+            posix_kill($pid, SIGKILL);
         });
         return $input;
     }
