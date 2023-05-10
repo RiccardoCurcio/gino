@@ -29,7 +29,7 @@ class Logger extends AbstractLogger
 {
 
     /**
-     * Costructor Logger
+     * Constructor Logger
      */
     public function __construct()
     {

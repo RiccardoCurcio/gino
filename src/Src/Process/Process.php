@@ -1,5 +1,5 @@
 <?php
-
+declare(ticks=1);
 /**
  * Process
  *
@@ -35,32 +35,52 @@ class Process
      * @param callable $callback
      * @return void
      */
-    public static function asyncPipeline(mixed $input = null, array $callbacks): void
-    {
+    // public static function asyncPipeline(mixed $input = null, array $callbacks): void
+    // {
 
-        $logger = new Logger();
-        $logger->debug("AsyncPipeline parent pid:" . posix_getpid());
+    //     $logger = new Logger();
+    //     $logger->debug("AsyncPipeline parent pid:" . posix_getpid() . " - " . posix_getppid());
+        
+    //     pcntl_signal(SIGCHLD, function($sig) use ($logger) {
+    //         $logger->error(" HANDLER #### ");
+    //         if ($sig == 9 || $sig == 17) {
+                
+    //             // try {
+    //             //     exit(1);
+    //             // } catch (\Exception) {
+    //             //     // --
+    //             // }
+    //             exit;
+    //         }
+           
+    //     }, true);
 
-        $pid = pcntl_fork();
+    //     $status = function($gparent) use (&$logger) {
+    //         $logger->debug("SyncPipeline complete ". $gparent);
+    //         posix_kill(posix_getppid(), SIGKILL);
+    //         pcntl_signal_dispatch();
+    //     };
 
-        if (!$pid) {
-            array_walk($callbacks, function ($value) use (&$logger, &$input) {
-                $pidPipeline = pcntl_fork();
-                if ($pidPipeline == -1) {
-                    $logger->error("AsyncPipeline erroe");
-                }
-                if ($pidPipeline == 0) {
-                    $logger->debug("AsyncPipeline child process pid:" . posix_getpid());
-                    $input = $value($input);
-                }
-                if ($pidPipeline > 0) {
-                    pcntl_wait($status);
-                }
-            });
-            $info = array();
-            pcntl_sigwaitinfo(array(SIGHUP), $info);
-        }
-    }
+
+    //     $pidPipeline = pcntl_fork();
+    //     if ($pidPipeline == -1) {
+    //         $logger->error("SyncPipeline erroe");
+    //     }
+
+    //     if ($pidPipeline == 0) {
+           
+    //         $logger->debug("AsyncPipeline child (parent) pid:" . posix_getpid());
+    //         $gpid = posix_getpid();
+    //         Process::syncPipeline($input, $callbacks, $status, $gpid);
+    //         // exit;
+    //     }
+
+    //     if ($pidPipeline > 0) {
+    //         // pcntl_wait($status, WUNTRACED);
+    //     }
+
+
+    // }
 
     /**
      * Create sync pipeline // callable $callback
@@ -73,19 +93,13 @@ class Process
     {
         $logger = new Logger();
         $logger->debug("SyncPipeline parent pid:" . posix_getpid());
-        array_walk($callbacks, function ($value) use (&$logger, &$input) {
-            $pidPipeline = pcntl_fork();
-            if ($pidPipeline == -1) {
-                $logger->error("SyncPipeline erroe");
-            }
-            if ($pidPipeline == 0) {
-                $logger->debug("syncPipeline child pid:" . posix_getpid());
-                $input = $value($input);
-            }
-            if ($pidPipeline > 0) {
-                pcntl_wait($status);
-            }
+        
+
+        array_walk($callbacks, function ($callback) use (&$logger, &$input, &$listOfChild) {
+            $logger->debug("syncPipeline child pid:" . posix_getpid());
+            $input = $callback($input);   
         });
+        
         return $input;
     }
 
@@ -95,25 +109,30 @@ class Process
      * @param array $callbacks
      * @return void
      */
-    public static function asyncStorm(array $callbacks): void
-    {
-        $logger = new Logger();
-        $logger->debug("AsyncStorm parent pid:" . posix_getpid());
+    // public static function asyncStorm(array $callbacks): void
+    // {
+    //     $logger = new Logger();
+    //     $logger->debug("AsyncStorm parent pid:" . posix_getpid());
 
-        $pidPipeline = array();
-        $pidPipelineInfo = array();
-        array_walk($callbacks, function ($value, $key) use (&$logger, &$pidPipeline, &$pidPipelineInfo) {
-            $logger->debug($key);
-            $pidPipeline[$key] = pcntl_fork();
-            if ($pidPipeline[$key] == -1) {
-                $logger->error("SyncStorm erroe");
-            }
-            if ($pidPipeline[$key] == 0) {
-                $logger->debug("AsyncStorm child pid:" . posix_getpid());
-                $value();
-                $pidPipelineInfo[$key] = array();
-                pcntl_sigwaitinfo(array(SIGHUP), $pidPipelineInfo[$key]);
-            }
-        });
-    }
+    //     pcntl_signal(SIGCHLD, function($sig) use ($logger) {
+    //         $logger->debug("sig " . $sig);
+    //         if ($sig == 9 || $sig == 17 || $sig == 15) {
+    //             exit(1);
+    //         }
+    //     });
+
+    //     $pidPipeline = array();
+    //     array_walk($callbacks, function ($callback, $key) use (&$logger, &$pidPipeline) {
+    //         $pidPipeline[$key] = pcntl_fork();
+    //         if ($pidPipeline[$key] == -1) {
+    //             $logger->error("SyncStorm erroe");
+    //         }
+    //         if ($pidPipeline[$key] == 0) {
+    //             $logger->debug("AsyncStorm child pid:" . posix_getpid());
+    //             $callback();
+    //             posix_kill(posix_getpid(), SIGKILL);
+    //             pcntl_signal_dispatch();
+    //         }
+    //     });
+    // }
 }
