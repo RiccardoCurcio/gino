@@ -199,8 +199,8 @@ $server->on(
 $server->start();
 ```
 
-## Process
-### AsyncPipeline
+## Pipelines
+<!-- ### AsyncPipeline
 ```php
 use Gino\Src\Logger\Logger;
 use Gino\Src\Process\Process;
@@ -227,7 +227,7 @@ $callback3 = function(mixed $input) use (&$logger) {
 };
 
 Process::asyncPipeline('input', [$callback1, $callback2, $callback3]);
-```
+``` -->
 ### SyncPipeline
 ```php
 use Gino\Src\Logger\Logger;
@@ -257,7 +257,7 @@ $callback3 = function(mixed $input) use (&$logger) {
 
 $result = Process::syncPipeline('input', [$callback1, $callback2, $callback3]);
 ```
-### AsyncStorm
+<!-- ### AsyncStorm
 ```php
 use Gino\Src\Logger\Logger;
 use Gino\Src\Process\Process;
@@ -282,7 +282,7 @@ $callbackStorm3 = function() {
 };
 
 Process::asyncStorm([$callbackStorm1, $callbackStorm2, $callbackStorm3]);
-```
+``` -->
 ## Examples
 
 [gino-examples](https://github.com/RiccardoCurcio/gino-examples)
