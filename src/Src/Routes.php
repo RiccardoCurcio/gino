@@ -254,7 +254,7 @@ trait Routes
      *
      * @return void
      */
-    public function connet(
+    public function connect(
         string $uri,
         string|Process $className,
         string|array $method,
