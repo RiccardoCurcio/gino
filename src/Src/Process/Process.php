@@ -1,4 +1,5 @@
 <?php
+
 declare(ticks=1);
 /**
  * Process
@@ -14,7 +15,8 @@ declare(ticks=1);
 
 namespace Gino\Src\Process;
 
-// use Gino\Src\Logger\Logger;
+use \Gino\Src\Async\Async;
+use \Gino\Src\Await\Await;
 
 /**
  * Process class
@@ -40,11 +42,11 @@ class Process
 
     //     $logger = new Logger();
     //     $logger->debug("AsyncPipeline parent pid:" . posix_getpid() . " - " . posix_getppid());
-        
+
     //     pcntl_signal(SIGCHLD, function($sig) use ($logger) {
     //         $logger->error(" HANDLER #### ");
     //         if ($sig == 9 || $sig == 17) {
-                
+
     //             // try {
     //             //     exit(1);
     //             // } catch (\Exception) {
@@ -52,7 +54,7 @@ class Process
     //             // }
     //             exit;
     //         }
-           
+
     //     }, true);
 
     //     $status = function($gparent) use (&$logger) {
@@ -68,7 +70,7 @@ class Process
     //     }
 
     //     if ($pidPipeline == 0) {
-           
+
     //         $logger->debug("AsyncPipeline child (parent) pid:" . posix_getpid());
     //         $gpid = posix_getpid();
     //         Process::syncPipeline($input, $callbacks, $status, $gpid);
@@ -91,10 +93,16 @@ class Process
      */
     public static function syncPipeline(mixed $input = null, array $callbacks): mixed
     {
-        array_walk($callbacks, function ($callback) use (&$input) {
-            $input = $callback($input);   
+        $promises = [];
+
+        array_walk($callbacks, function ($callback) use (&$promises) {
+            array_push($promises, Async::async($callback));
         });
-        
+
+        array_walk($promises, function ($promise) use (&$input) {
+            $input = Await::await($promise($input));
+        });
+
         return $input;
     }
 
