@@ -10,7 +10,7 @@ Simple json api framework over swoole for php microservice
     * use pipeline
 * load env file
 * resolve dependency injection
-* versionig type (URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER)
+* versioning type (URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER)
 * resolve cors-origin
 * Process
     * asyncPipeline
