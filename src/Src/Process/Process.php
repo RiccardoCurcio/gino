@@ -14,7 +14,7 @@ declare(ticks=1);
 
 namespace Gino\Src\Process;
 
-use Gino\Src\Logger\Logger;
+// use Gino\Src\Logger\Logger;
 
 /**
  * Process class
@@ -91,12 +91,7 @@ class Process
      */
     public static function syncPipeline(mixed $input = null, array $callbacks): mixed
     {
-        $logger = new Logger();
-        $logger->debug("SyncPipeline parent pid:" . posix_getpid());
-        
-
-        array_walk($callbacks, function ($callback) use (&$logger, &$input, &$listOfChild) {
-            $logger->debug("syncPipeline child pid:" . posix_getpid());
+        array_walk($callbacks, function ($callback) use (&$input) {
             $input = $callback($input);   
         });
         

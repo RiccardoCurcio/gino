@@ -40,7 +40,7 @@ class Response
     private $response;
 
     /**
-     * Costructor of Response class
+     * Constructor of Response class
      *
      * @param SwooleResponse|SwooleResponse2 $swooleResponse
      *

@@ -30,7 +30,7 @@ trait DependencyInjection
      * @param string $className
      * @return object
      */
-    public function containers(string $className) : object
+    public function containers(string $className) : ?object
     {
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();

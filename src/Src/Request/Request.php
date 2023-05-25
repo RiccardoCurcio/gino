@@ -32,7 +32,7 @@ class Request
     private $params;
 
     /**
-     * Costructor of request class
+     * Constructor of request class
      *
      * @return void
      */
@@ -41,7 +41,7 @@ class Request
         $this->params = [];
     }
     /**
-     * Set new param fron a http request
+     * Set new param from a http request
      *
      * @param string $name
      * @param mixed  $value

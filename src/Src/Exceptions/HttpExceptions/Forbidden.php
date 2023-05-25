@@ -26,7 +26,7 @@ namespace Gino\Src\Exceptions\HttpExceptions;
 class Forbidden extends \Exception
 {
     /**
-     * Costructor
+     * Constructor
      *
      * @param string     $message
      * @param integer    $code

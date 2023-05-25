@@ -41,7 +41,7 @@ class CorsController
     private $logger;
 
     /**
-     * Costructor Cors
+     * Constructor Cors
      *
      * @param \Psr\Log\LoggerInterface      $logger
      *
