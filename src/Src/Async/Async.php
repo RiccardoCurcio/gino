@@ -19,11 +19,18 @@ namespace Gino\Src\Async;
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use function React\Async\async as ReactAsync;
+use React\Promise\PromiseInterface;
+use function React\Promise\Timer\sleep as ReactSleep;
 
 class Async
 {
     public static function async(callable $function): callable
     {
         return ReactAsync($function);
+    }
+
+    public static function sleep(float $seconds = 0.0): PromiseInterface
+    {
+       return ReactSleep($seconds);
     }
 }

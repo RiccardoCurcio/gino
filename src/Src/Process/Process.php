@@ -35,54 +35,20 @@ class Process
      *
      * @param mixed $input
      * @param callable $callback
+     * @param callable | null $onFulfilled
+     * @param callable | null $onRejected
      * @return void
      */
-    // public static function asyncPipeline(mixed $input = null, array $callbacks): void
-    // {
+    public static function asyncPipeline(mixed $input = null, array $callbacks, ?callable $onFulfilled = null, ?callable $onRejected = null): void
+    {
 
-    //     $logger = new Logger();
-    //     $logger->debug("AsyncPipeline parent pid:" . posix_getpid() . " - " . posix_getppid());
+        $runner = Async::async(function () use ($input, $callbacks): mixed {
+            $result = Process::syncPipeline($input, $callbacks);
+            return $result;
+        })();
 
-    //     pcntl_signal(SIGCHLD, function($sig) use ($logger) {
-    //         $logger->error(" HANDLER #### ");
-    //         if ($sig == 9 || $sig == 17) {
-
-    //             // try {
-    //             //     exit(1);
-    //             // } catch (\Exception) {
-    //             //     // --
-    //             // }
-    //             exit;
-    //         }
-
-    //     }, true);
-
-    //     $status = function($gparent) use (&$logger) {
-    //         $logger->debug("SyncPipeline complete ". $gparent);
-    //         posix_kill(posix_getppid(), SIGKILL);
-    //         pcntl_signal_dispatch();
-    //     };
-
-
-    //     $pidPipeline = pcntl_fork();
-    //     if ($pidPipeline == -1) {
-    //         $logger->error("SyncPipeline erroe");
-    //     }
-
-    //     if ($pidPipeline == 0) {
-
-    //         $logger->debug("AsyncPipeline child (parent) pid:" . posix_getpid());
-    //         $gpid = posix_getpid();
-    //         Process::syncPipeline($input, $callbacks, $status, $gpid);
-    //         // exit;
-    //     }
-
-    //     if ($pidPipeline > 0) {
-    //         // pcntl_wait($status, WUNTRACED);
-    //     }
-
-
-    // }
+        $runner->then($onFulfilled, $onRejected);
+    }
 
     /**
      * Create sync pipeline // callable $callback
