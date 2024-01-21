@@ -43,7 +43,7 @@ trait CorsHeaders
             "access-control-expose-headers" => " ",
             "Server" => getenv("SERVICE_NAME") ? getenv("SERVICE_NAME") : "gino-app",
             "vary" => getenv("VARY") ? getenv("VARY") : "Origin",
-            "cache-controll" => getenv("CACHE_CONTROLL") ? getenv("CACHE_CONTROLL") : "private, must-revalidate"
+            "cache-controll" => getenv("CACHE_CONTROL") ? getenv("CACHE_CONTROL") : "private, must-revalidate"
         ];
     }
 }

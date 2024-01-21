@@ -55,7 +55,7 @@ class Routing
             "CONNECT"   => []
         ];
        
-        if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(getenv("CROSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
             $this->resolveCors($this);
         }
     }

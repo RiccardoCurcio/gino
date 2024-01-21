@@ -13,8 +13,6 @@
 namespace Gino\Src;
 
 
-use Gino\Src\Process\Process;
-
 /**
  * Routes trait
  *
@@ -31,7 +29,7 @@ trait Routes
      * Set GET route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -39,7 +37,7 @@ trait Routes
      */
     public function get(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -48,7 +46,7 @@ trait Routes
             $this->routes["GET"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -59,7 +57,7 @@ trait Routes
      * Set POST route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -67,7 +65,7 @@ trait Routes
      */
     public function post(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -75,7 +73,7 @@ trait Routes
             $this->routes["POST"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -86,7 +84,7 @@ trait Routes
      * Set PUT route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -94,7 +92,7 @@ trait Routes
      */
     public function put(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -102,7 +100,7 @@ trait Routes
             $this->routes["PUT"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -113,7 +111,7 @@ trait Routes
      * Set PATCH route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -121,7 +119,7 @@ trait Routes
      */
     public function patch(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -129,7 +127,7 @@ trait Routes
             $this->routes["PATCH"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -140,7 +138,7 @@ trait Routes
      * Set DELETE route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -148,7 +146,7 @@ trait Routes
      */
     public function delete(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -156,7 +154,7 @@ trait Routes
             $this->routes["DELETE"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -167,7 +165,7 @@ trait Routes
      * Set OPTION route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -175,7 +173,7 @@ trait Routes
      */
     public function options(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -183,7 +181,7 @@ trait Routes
             $this->routes["OPTIONS"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -194,7 +192,7 @@ trait Routes
      * Set HEAD route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -202,7 +200,7 @@ trait Routes
      */
     public function head(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -210,7 +208,7 @@ trait Routes
             $this->routes["HEAD"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -221,7 +219,7 @@ trait Routes
      * Set TRACE route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -229,7 +227,7 @@ trait Routes
      */
     public function trace(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
@@ -237,7 +235,7 @@ trait Routes
             $this->routes["TRACE"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
@@ -248,7 +246,7 @@ trait Routes
      * Set CONNECT route
      *
      * @param string $uri
-     * @param string|Process $className
+     * @param string $className
      * @param string|array $method
      * @param array  $middlewares
      *
@@ -256,28 +254,18 @@ trait Routes
      */
     public function connect(
         string $uri,
-        string|Process $className,
+        string $className,
         string|array $method,
         array $middlewares = []
     ) : void {
         array_push(
-            $this->routes["CONNET"],
+            $this->routes["CONNECT"],
             [
                 "uri" => $uri,
-                "className" => $this->isProcess($className) ? "process" : $this->containers($className),
+                "className" => $this->containers($className),
                 "method" => $method,
                 "middlewares" => $middlewares
             ]
         );
-    }
-
-    /**
-     * Check is a process
-     *
-     * @param mixed $process
-     * @return boolean
-     */
-    public static function isProcess(mixed $process) : bool {
-        return $process == Process::class;
     }
 }

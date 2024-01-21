@@ -11,11 +11,7 @@ Simple json api framework over swoole for php microservice
 * load env file
 * resolve dependency injection
 * versioning type (URI, QUERYSTRING, CUSTOM_HEADER, ACCEPT_HEADER)
-* resolve cors-origin
-* Process
-    * asyncPipeline
-    * syncPipeline
-    * asyncStorm 
+* resolve cross-origin
 
 # DOC
 ## Env file
@@ -48,15 +44,15 @@ VERSIONING_KEY=version
 # VERSIONING_ALLOWED_RESPONSE_TYPE=json,xml
 
 
-# CORSS_ORIGIN
-CORSS_ORIGIN_RESOLVE=true
+# CROSS_ORIGIN
+CROSS_ORIGIN_RESOLVE=true
 ALLOW_CREDENTIALS=true
 ALLOW_ORIGIN=https://gino-app.local
 ALLOW_METHODS=POST, GET, PUT, PATCH, DELETE, OPTIONS
 ALLOW_HEADERS=Content-Type
 MAX_AGE=86400
 VARY=Origin
-CACHE_CONTROLL=private, must-revalidate
+CACHE_CONTROL=private, must-revalidate
 ```
 ## Env
 ### Load env
@@ -107,55 +103,6 @@ $app->post(
 
 ```
 
-### Use pipeline
-
-```php
-use Gino\Src\Process\Process;
-use Gino\Src\Logger\Logger;
-
-.
-.
-.
-
-$logger = new Logger();
-
-$callback1 = function(mixed $input) use (&$logger)  {
-    $logger = new Logger();
-    $logger->info("Process CB1 Start");
-    $input["data"] = 1;
-    $logger->info("Process CB1 Finish");
-    return $input;
-};
-
-$callback2 = function(mixed $input) use (&$logger)  {
-    $logger = new Logger();
-    $logger->info("CB2 Start calback");
-    $input["data"] = $input["data"] + 1;
-    $logger->info("CB2 Finish calback");
-    return $input;
-};
-
-$callback3 = function(mixed $input) use (&$logger)  {
-    $logger = new Logger();
-    $logger->info("CB3 Start calback");
-    $input["data"] = $input["data"] + 1;
-    $logger->info("CB3 Finish calback");
-    $input["response"]->response(
-        $input["request"],
-        [
-            "msg" => $input["data"]
-        ],
-        200
-    );
-};
-
-$app->get(
-    'v1/process',
-    Process::class,
-    [$callback1, $callback2, $callback3]
-);
-
-```
 ## Server (SWOOLE)
 ### Init http server
 ```php
@@ -199,90 +146,6 @@ $server->on(
 $server->start();
 ```
 
-## Pipelines
-<!-- ### AsyncPipeline
-```php
-use Gino\Src\Logger\Logger;
-use Gino\Src\Process\Process;
-
-$logger = new Logger();
-$callback1 = function(mixed $input) use (&$logger) {
-    $logger->info("CB1 Start calback");
-    // your code
-    $logger->info("CB1 Finish calback");
-    return " cb1";
-};
-
-$callback2 = function(mixed $input) use (&$logger) {
-    $logger->info("CB2 Start calback");
-    // your code
-    $logger->info("CB2 Finish calback");
-    return "cb2";
-};
-
-$callback3 = function(mixed $input) use (&$logger) {
-    $logger->info("CB3 Start calback");
-    // your code
-    $logger->info("CB3 Finish calback");
-};
-
-Process::asyncPipeline('input', [$callback1, $callback2, $callback3]);
-``` -->
-### SyncPipeline
-```php
-use Gino\Src\Logger\Logger;
-use Gino\Src\Process\Process;
-
-$logger = new Logger();
-$callback1 = function(mixed $input) use (&$logger) {
-    $logger->info("CB1 Start calback");
-    // your code
-    $logger->info("CB1 Finish calback");
-    return " cb1";
-};
-
-$callback2 = function(mixed $input) use (&$logger) {
-    $logger->info("CB2 Start calback");
-    // your code
-    $logger->info("CB2 Finish calback");
-    return "cb2";
-};
-
-$callback3 = function(mixed $input) use (&$logger) {
-    $logger->info("CB3 Start calback");
-    // your code
-    $logger->info("CB3 Finish calback");
-    return "cb3";
-};
-
-$result = Process::syncPipeline('input', [$callback1, $callback2, $callback3]);
-```
-<!-- ### AsyncStorm
-```php
-use Gino\Src\Logger\Logger;
-use Gino\Src\Process\Process;
-
-$logger = new Logger();
-$callbackStorm1 = function() {
-    $logger->info("CB1 Start calback");
-    // your code
-    $logger->info("CB1 Finish calback");
-};
-
-$callbackStorm2 = function() {
-    $logger->info("CB2 CB2 Start calback");
-    // your code
-    $logger->info("CB2 Finish calback");
-};
-
-$callbackStorm3 = function() {
-    $logger->info("CB3 CB3 Start calback");
-    // your code
-    $logger->info("CB3 Finish calback");
-};
-
-Process::asyncStorm([$callbackStorm1, $callbackStorm2, $callbackStorm3]);
-``` -->
 ## Examples
 
 [gino-examples](https://github.com/RiccardoCurcio/gino-examples)

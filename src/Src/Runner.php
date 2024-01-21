@@ -20,8 +20,6 @@ use Swoole\Http2\Request as SwooleRequest2;
 use Swoole\Http2\Response as SwooleResponse2;
 use Gino\Src\Request\Request;
 use Gino\Src\Response\Response;
-// use \Gino\Src\CorsHeaders\CorsHeaders;
-use Gino\Src\Process\Process;
 
 /**
  * Runner trait
@@ -53,19 +51,12 @@ trait Runner
         try {
             $worker = $this->match($httpRequest, $this->routes);
             $worker ? $worker['request']->set('add', $this->add) : null;
-            $this->middelwareRun($worker['middlewares'], $worker['request']);
-
-            $worker['class'] == "process" ? Process::syncPipeline(
-                [
-                    "request" => $worker['request'],
-                    "response" => $response
-                ],
-                $worker['method']
-            ) : $worker['class']->{$worker['method']}($worker['request'], $response);
+            $this->middlewareRun($worker['middlewares'], $worker['request']);
+            $worker['class']->{$worker['method']}($worker['request'], $response);
         } catch (\Exception $ex) {
             $corsHeader = [];
 
-            if (filter_var(getenv("CORSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
+            if (filter_var(getenv("CROSS_ORIGIN_RESOLVE"), FILTER_VALIDATE_BOOLEAN)) {
                 $corsHeader = $this->getCorsHeaders();
             }
 
@@ -89,7 +80,7 @@ trait Runner
      *
      * @return void
      */
-    private function middelwareRun(array $middlewares, Request $request): void
+    private function middlewareRun(array $middlewares, Request $request): void
     {
         array_walk(
             $middlewares,
